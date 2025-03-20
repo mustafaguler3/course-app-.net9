@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Data.Entity;
+
 using Course.DataAccess.Context;
 using Course.DataAccess.Repositories;
 using Course.Entities.Concrete;
+using Microsoft.EntityFrameworkCore;
 
 namespace Course.DataAccess.Concrete
 {

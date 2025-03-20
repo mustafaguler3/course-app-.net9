@@ -19,7 +19,12 @@ namespace Course.API.Controllers
         public async Task<IActionResult> Categories()
         {
             var categories = await _categoryService.GetCategoriesAsync();
-
+            
+            if (categories == null || categories.Count == 0)
+            {
+                return NotFound("Kategori bulunamadı veya veri yok.");
+            }
+            
             return Ok(categories);
         }
     }

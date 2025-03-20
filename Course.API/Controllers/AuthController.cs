@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Course.API.Controllers
 {
-	[Route("api/auth/")]
+	[Route("api/auth")]
 	[ApiController]
 	public class AuthController : ControllerBase
 	{
@@ -19,15 +19,36 @@ namespace Course.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+
+                return BadRequest(new { errors });
+            }
             var result = await _authService.RegisterAsync(registerDto);
-            return Ok(new { token = result });
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok(result);
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var result = await _authService.LoginAsync(loginDto);
-            return Ok(new { token = result });
+    
+            if (result == null)
+            {
+                return Unauthorized("Invalid credentials");
+            }
+            return Ok(result);
         }
     }
 }

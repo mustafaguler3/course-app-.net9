@@ -10,17 +10,18 @@ public class CourseDbContextFactory : IDesignTimeDbContextFactory<CourseDbContex
 {
     public CourseDbContext CreateDbContext(string[] args)
     {
-        
-        
-        Batteries.Init();
-        
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("/Users/mustafa/Projects/course-app/Course.API/appsettings.json", optional: false, reloadOnChange: true)
-                .Build();
+        var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
+
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+            .AddJsonFile($"appsettings.{environmentName}.json", optional: true)
+            .AddUserSecrets<CourseDbContextFactory>()
+            .AddEnvironmentVariables()
+            .Build();
 
             var optionsBuilder = new DbContextOptionsBuilder<CourseDbContext>();
-            optionsBuilder.UseSqlite(configuration.GetConnectionString("DefaultConnection"));
+            optionsBuilder.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
 
             return new CourseDbContext(optionsBuilder.Options);
         
